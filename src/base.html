@@ -143,9 +143,7 @@
 
     <!-- Analytics -->
     {% block analytics %}
-      {% if config.google_analytics %}
-        {% include "partials/integrations/analytics.html" %}
-      {% endif %}
+      {% include "partials/integrations/analytics.html" %}
     {% endblock %}
 
     <!-- Custom front matter -->
@@ -323,7 +321,7 @@
                   {% if page.meta.git_revision_date_localized or
                         page.meta.revision_date
                   %}
-                    {% include "partials/source-date.html" %}
+                    {% include "partials/source-file.html" %}
                   {% endif %}
                 {% endif %}
               {% endblock %}
@@ -345,6 +343,7 @@
             data-md-state="hidden"
           >
             {% include ".icons/material/arrow-up.svg" %}
+            {{ lang.t('top.title') }}
           </a>
         {% endif %}
       </main>
@@ -385,7 +384,8 @@
         "search.result.other",
         "search.result.more.one",
         "search.result.more.other",
-        "search.result.term.missing"
+        "search.result.term.missing",
+        "select.version.title"
       ] -%}
         {%- set _ = translations.update({ key: lang.t(key) }) -%}
       {%- endfor -%}

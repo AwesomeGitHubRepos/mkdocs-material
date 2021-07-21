@@ -33,8 +33,8 @@ import {
   finalize,
   map,
   observeOn,
-  startWith,
   switchMap,
+  take,
   tap,
   withLatestFrom,
   zipWith
@@ -51,25 +51,15 @@ import {
   watchElementThreshold
 } from "~/browser"
 import {
-  SearchResult as SearchResultData,
+  SearchResult,
   SearchWorker,
+  isSearchReadyMessage,
   isSearchResultMessage
 } from "~/integrations"
-import { renderSearchResult } from "~/templates"
+import { renderSearchResultItem } from "~/templates"
 
 import { Component } from "../../_"
 import { SearchQuery } from "../query"
-
-/* ----------------------------------------------------------------------------
- * Types
- * ------------------------------------------------------------------------- */
-
-/**
- * Search result
- */
-export interface SearchResult {
-  data: SearchResultData[]             /* Search result data */
-}
 
 /* ----------------------------------------------------------------------------
  * Helper types
@@ -107,29 +97,41 @@ export function mountSearchResult(
       filter(Boolean)
     )
 
-  /* Update search result metadata */
+  /* Retrieve nested components */
   const meta = getElementOrThrow(":scope > :first-child", el)
+  const list = getElementOrThrow(":scope > :last-child", el)
+
+  /* Update search result metadata when ready */
+  rx$
+    .pipe(
+      filter(isSearchReadyMessage),
+      take(1)
+    )
+      .subscribe(() => {
+        resetSearchResultMeta(meta)
+      })
+
+  /* Update search result metadata */
   internal$
     .pipe(
       observeOn(animationFrameScheduler),
       withLatestFrom(query$)
     )
-      .subscribe(([{ data }, { value }]) => {
+      .subscribe(([{ items }, { value }]) => {
         if (value)
-          setSearchResultMeta(meta, data.length)
+          setSearchResultMeta(meta, items.length)
         else
           resetSearchResultMeta(meta)
       })
 
   /* Update search result list */
-  const list = getElementOrThrow(":scope > :last-child", el)
   internal$
     .pipe(
       observeOn(animationFrameScheduler),
       tap(() => resetSearchResultList(list)),
-      switchMap(({ data }) => merge(
-        of(...data.slice(0, 10)),
-        of(...data.slice(10))
+      switchMap(({ items }) => merge(
+        of(...items.slice(0, 10)),
+        of(...items.slice(10))
           .pipe(
             bufferCount(4),
             zipWith(boundary$),
@@ -138,15 +140,14 @@ export function mountSearchResult(
       ))
     )
       .subscribe(result => {
-        addToSearchResultList(list, renderSearchResult(result))
+        addToSearchResultList(list, renderSearchResultItem(result))
       })
 
-  /* Filter search result list */
+  /* Filter search result message */
   const result$ = rx$
     .pipe(
       filter(isSearchResultMessage),
-      map(({ data }) => ({ data })),
-      startWith({ data: [] })
+      map(({ data }) => data)
     )
 
   /* Create and return component */

@@ -236,8 +236,8 @@ Note that it doesn't rely on third-party plugins[^2]._
 :octicons-unlock-24: Feature flag
 
 A _back-to-top button_ can be shown when the user, after scrolling down, starts
-to scroll up again. It's rendered in the lower right corner of the viewport. Add
-the following lines to `mkdocs.yml`:
+to scroll up again. It's rendered centered and just below the header. Add the
+following lines to `mkdocs.yml`:
 
 ``` yaml
 theme:
@@ -245,17 +245,7 @@ theme:
     - navigation.top
 ```
 
-<figure markdown="1">
-
 [![back-to-top button][20]][20]
-
-  <figcaption markdown="1">
-
-A demo is worth a thousand words — check it out at
-[squidfunk.github.io/mkdocs-material-insiders][21]
-
-  </figcaption>
-</figure>
 
   [19]: https://github.com/squidfunk/mkdocs-material/blob/master/src/assets/stylesheets/main/layout/_top.scss
   [20]: ../assets/screenshots/back-to-top.png
@@ -377,7 +367,9 @@ The content section will now always stretch to the right side, resulting in
 more space for your content. This feature flag can be combined with all other
 feature flags, e.g. [tabs][1] and [sections][2]. 
 
-### Hide the sidebars
+## Usage
+
+### Hiding the sidebars
 
 [:octicons-file-code-24: Source][28] ·
 :octicons-note-24: Metadata
@@ -386,13 +378,14 @@ Sometimes it's desirable to hide the navigation and/or table of contents
 sidebar, especially when there's a single navigation item. This can be done for
 any page using the [Metadata][29] extension:
 
-``` yaml
+``` bash
 ---
 hide:
-  - navigation # Hide navigation
-  - toc        # Hide table of contents
+  - navigation
+  - toc
 ---
 
+# Document title
 ...
 ```
 

@@ -36,6 +36,9 @@ export type Flag =
   | "navigation.sections"              /* Sections navigation */
   | "navigation.tabs"                  /* Tabs navigation */
   | "navigation.top"                   /* Back-to-top button */
+  | "search.highlight"                 /* Search highlighting */
+  | "search.share"                     /* Search sharing */
+  | "search.suggest"                   /* Search suggestions */
   | "toc.integrate"                    /* Integrated table of contents */
 
 /* ------------------------------------------------------------------------- */
@@ -57,6 +60,7 @@ export type Translation =
   | "search.result.more.one"           /* 1 more on this page */
   | "search.result.more.other"         /* # more on this page */
   | "search.result.term.missing"       /* Missing */
+  | "select.version.title"             /* Version selector */
 
 /**
  * Translations

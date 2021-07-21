@@ -91,18 +91,18 @@ configuring syntax highlighting of code blocks:
 :   :octicons-milestone-24: Default: `table` – The Highlight extension provides
     three ways to add line numbers, all of which are supported by Material for
     MkDocs. While `table` wraps a code block in a table, `inline` and
-    `pymdownx.inline` render line numbers as part of the line itself:
+    `pymdownx-inline` render line numbers as part of the line itself:
 
     ``` yaml
     markdown_extensions:
       - pymdownx.highlight:
-          linenums_style: pymdownx.inline
+          linenums_style: pymdownx-inline
     ```
 
     Note that `inline` will put line numbers next to the actual code, which
     means that they will be included when selecting text with the cursor or 
     copying a code block to the clipboard. Thus, the usage of `table` or
-    `pymdownx.inline` is recommended.
+    `pymdownx-inline` is recommended.
 
 _Material for MkDocs doesn't provide official support for the other options of
 this extension, so they may be supported but might yield unexpected results.
@@ -223,7 +223,14 @@ to the corresponding tooltip.
 
 In order to opt-in to annotation support, a slightly different syntax is
 required – just add the respective [language short code][17] and the `.annotate`
-class, after the three backticks.
+class, after the three backticks. Alternatively, if you want to enable annotations
+globally, add the following to `mkdocs.yml`:
+
+``` yaml
+theme:
+  features:
+    - content.code.annotate
+```
 
 Note that annotations can be __placed anywhere__ in a code block where a comment
 for the language can be placed, which for JavaScript is `// (1)` and
@@ -232,7 +239,7 @@ for the language can be placed, which for JavaScript is `// (1)` and
 _Example_:
 
 ```` markdown
-``` { .js .annotate }
+``` js
 document$.subscribe(function() { // (1)
   var tables = document.querySelectorAll(/* (2) */ "article table")
   tables.forEach(function(table) {
@@ -247,19 +254,56 @@ document$.subscribe(function() { // (1)
 
 _Result_:
 
-<figure markdown="1">
+``` js
+document$.subscribe(function() { // (1)
+  var tables = document.querySelectorAll(/* (2) */ "article table")
+  tables.forEach(function(table) {
+    new Tablesort(table) // (3)
+  })
+})
+```
 
-[![Annotations][19]][19]
+1. Annotations can contain __arbitrary content__ which is shown when the marker
+   is focussed, including any kind of formatting, links, admonitions, details,
+   and even diagrams:
 
-  <figcaption markdown="1">
+    ``` mermaid
+    graph LR
+      A[I'm] --> B{a} --> C[diagram];
+    ```
 
-A demo is worth a thousand words — check it out at
-[squidfunk.github.io/mkdocs-material-insiders][20]
+    :octicons-light-bulb-16:
+    **Tip:** You can use ++tab++ to navigate annotations.
 
-  </figcaption>
-</figure>
+2. Annotations can be __placed anywhere__ in a code block were a comment for the
+   underlying language can be placed. 
 
-_Annotations require syntax highlighting with [Pygments][24] – they're currently
+    === "Python"
+
+        ``` python
+        # (1)
+        ```
+
+    === "JavaScript"
+
+        ``` js
+        // (2)
+        /* (2) */
+        ```
+
+    === "Lua"
+
+        ``` lua
+        -- (3)
+        ```
+
+    _We're working on a solution for languages without comments, which will be
+    available shortly._
+
+  1. Of course, this can be combined with [line numbers][10], highlighting and
+     all other code block related features.
+
+_Annotations require syntax highlighting with [Pygments][26] – they're currently
 not compatible with other JavaScript-based syntax highlighters. Support may be
 added later on._
 
@@ -345,7 +389,7 @@ The `#!python range()` function is used to generate a sequence of numbers.
 ### Adding keyboard keys
 
 When [Keys][22] is enabled, keyboard keys can be rendered with a simple syntax.
-Consult the [Python Markdown Extensions][16] documentation to learn about all
+Consult the [Python Markdown Extensions][14] documentation to learn about all
 available key codes.
 
 _Example_:
@@ -445,4 +489,4 @@ override it as part of your additional stylesheet:
   [26]: #use-pygments
   [27]: ../setup/changing-the-colors.md#color-scheme
   [28]: https://pygments.org/docs/tokens/#literals
-  [29]: https://github.com/squidfunk/mkdocs-material/blob/master/src/assets/stylesheets/main/extensions/markdown/_codehilite.scss
+  [29]: https://github.com/squidfunk/mkdocs-material/blob/master/src/assets/stylesheets/main/extensions/pymdownx/_highlight.scss

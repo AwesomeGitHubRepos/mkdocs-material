@@ -78,11 +78,17 @@ you can [define the `outdated` block][9]:
 ``` html
 {% block outdated %}
   You're not viewing the latest version.
-  <a href="{{ config.site_url | url }}">
-    Click here to go to latest.
+  <a href="{{ '../' ~ base_url }}"> <!-- (1) -->
+    <strong>Click here to go to latest.</strong>
   </a>
 {% endblock %}
 ```
+
+1. Given this value for the `href` attribute, the link will always redirect to 
+   the root of your site, which will then redirect to the latest version. This
+   ensures that older versions of your site do not depend on a specific alias,
+   e.g. `latest`, to allow for changing the alias later on without breaking
+   earlier versions.
 
 This will render a version warning above the header:
 
@@ -102,7 +108,7 @@ Make sure that this matches the [default version][11].
 
   [7]: ../insiders/index.md
   [8]: ../customization.md#extending-the-theme
-  [9]: ../customization.md#overriding-blocks
+  [9]: ../customization.md#overriding-blocks-recommended
   [10]: ../assets/screenshots/version-warning.png
   [11]: #setting-a-default-version
 
