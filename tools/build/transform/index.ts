@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -22,24 +22,22 @@
 
 import { createHash } from "crypto"
 import { build as esbuild } from "esbuild"
+import * as fs from "fs/promises"
 import * as path from "path"
 import postcss from "postcss"
 import {
-  NEVER,
+  EMPTY,
   Observable,
+  catchError,
   concat,
   defer,
-  merge,
-  of
-} from "rxjs"
-import {
-  catchError,
   endWith,
   ignoreElements,
+  merge,
+  of,
   switchMap
-} from "rxjs/operators"
-import { render as sass } from "sass"
-import { promisify } from "util"
+} from "rxjs"
+import { compile } from "sass"
 
 import { base, mkdir, write } from "../_"
 
@@ -62,7 +60,8 @@ interface TransformOptions {
 /**
  * Base directory for source map resolution
  */
-const root = new RegExp(`file://${path.resolve(".")}/`, "g")
+const currentPath = path.resolve(".").replace(new RegExp(`\\${path.win32.sep}`, "g"), path.posix.sep)
+const root = path.sep === path.posix.sep ? new RegExp(`file://${currentPath}/`, "g") : new RegExp(`file:///${currentPath}/`, "g")
 
 /* ----------------------------------------------------------------------------
  * Helper functions
@@ -99,24 +98,25 @@ function digest(file: string, data: string): string {
 export function transformStyle(
   options: TransformOptions
 ): Observable<string> {
-  return defer(() => promisify(sass)({
-    file: options.from,
-    outFile: options.to,
-    includePaths: [
-      "src/assets/stylesheets",
+  return defer(() => of(compile(options.from, {
+    loadPaths: [
+      "src/templates/assets/stylesheets",
       "node_modules/modularscale-sass/stylesheets",
       "node_modules/material-design-color",
       "node_modules/material-shadows"
     ],
-    sourceMap: true,
-    sourceMapContents: true
-  }))
+    silenceDeprecations: ["global-builtin", "import"],
+    sourceMap: true
+  })))
     .pipe(
-      switchMap(({ css, map }) => postcss([
+      switchMap(({ css, sourceMap }) => postcss([
         require("autoprefixer"),
+        require("postcss-logical"),
+        require("postcss-dir-pseudo-class"),
+        require("postcss-pseudo-is"),
         require("postcss-inline-svg")({
           paths: [
-            `${base}/.icons`
+            `${base}/templates/.icons`
           ],
           encode: false
         }),
@@ -126,15 +126,16 @@ export function transformStyle(
       ])
         .process(css, {
           from: options.from,
+          to: options.to,
           map: {
-            prev: `${map}`,
+            prev: sourceMap,
             inline: false
           }
         })
       ),
       catchError(err => {
         console.log(err.formatted || err.message)
-        return NEVER
+        return EMPTY
       }),
       switchMap(({ css, map }) => {
         const file = digest(options.to, css)
@@ -172,9 +173,33 @@ export function transformScript(
     write: false,
     bundle: true,
     sourcemap: true,
-    minify: process.argv.includes("--optimize")
+    legalComments: "inline",
+    minify: process.argv.includes("--optimize"),
+    plugins: [
+
+      /* Plugin to minify inlined CSS (e.g. for Mermaid.js) */
+      {
+        name: "mkdocs-material/inline",
+        setup(build) {
+          build.onLoad({ filter: /\.css/ }, async args => {
+            const content = await fs.readFile(args.path, "utf8")
+            const { css } = await postcss([require("cssnano")])
+              .process(content, {
+                from: undefined
+              })
+
+            /* Return minified CSS */
+            return {
+              contents: css,
+              loader: "text"
+            }
+          })
+        }
+      }
+    ]
   }))
     .pipe(
+      catchError(() => EMPTY),
       switchMap(({ outputFiles: [file] }) => {
         const contents = file.text.split("\n")
         const [, data] = contents[contents.length - 2].split(",")

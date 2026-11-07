@@ -1,82 +1,51 @@
 # Contributing
 
-Interested in contributing to the Material for MkDocs? Want to report a bug?
-Have a question? Before you do, please read the following guidelines.
+Material for MkDocs is in maintenance mode, with critical bug fixes and security
+updates through **May 5, 2027**. Report vulnerabilities privately using our
+[security policy].
 
-## Submission context
+  [Discord channel]: https://discord.gg/hqXRNq9CjT
+  [security policy]: SECURITY.md
 
-### Got a question or problem?
+## How to contribute
 
-For quick questions there's no need to open an issue as you can reach us on
-[gitter.im][1].
+### Creating an issue
 
-  [1]: https://gitter.im/squidfunk/mkdocs-material
+-   #### [Report a bug]
 
-### Found a bug?
+    __Something is not working?__ Report a critical bug in Material for MkDocs by
+    creating an issue with a reproduction
 
-If you found a bug in the source code, you can help us by submitting an issue
-to the [issue tracker][2] in our GitHub repository. Even better, you can submit
-a Pull Request with a fix. However, before doing so, please read the
-[submission guidelines][3].
+-   #### [Report a docs issue]
 
-  [2]: https://github.com/squidfunk/mkdocs-material/issues
-  [3]: #submission-guidelines
+    __Missing information in our docs?__ Report missing information or
+    potential inconsistencies in our documentation
 
-### Missing a feature?
+-   #### [Request a change]
 
-You can request a new feature by submitting an issue to our GitHub Repository.
-If you would like to implement a new feature, please submit an issue with a
-proposal for your work first, to be sure that it is of use for everyone, as
-Material for MkDocs is highly opinionated. Please consider what kind of change
-it is:
+    __Want to submit an idea?__ Find out where to propose new features for
+    Zensical
 
-* For a **major feature**, first open an issue and outline your proposal so
-  that it can be discussed. This will also allow us to better coordinate our
-  efforts, prevent duplication of work, and help you to craft the change so
-  that it is successfully accepted into the project.
+-   #### [Ask a question]
 
-* **Small features and bugs** can be crafted and directly submitted as a Pull
-  Request. However, there is no guarantee that your feature will make it into
-  the `master`, as it's always a matter of opinion whether if benefits the
-  overall functionality of the project.
+    __Have a question or need help?__ Get in touch with our community on the
+    free [Discord channel]
 
-## Submission guidelines
+### Contributing
 
-### Submitting an issue
+-   #### [Fix a translation]
 
-Before you submit an issue, please search the issue tracker, maybe an issue for
-your problem already exists and the discussion might inform you of workarounds
-readily available.
+    __Found a translation error?__ Correct a translation for an existing
+    language
 
-We want to fix all the issues as soon as possible, but before fixing a bug we
-need to reproduce and confirm it. In order to reproduce bugs we will
-systematically ask you to provide a minimal reproduction scenario using the
-custom issue template. Please stick to the issue template.
+-   #### [Create a pull request]
 
-Unfortunately we are not able to investigate / fix bugs without a minimal
-reproduction scenario, so if we don't hear back from you we may close the issue.
+    __Want to contribute a fix?__ Learn how to create a pull request for a
+    critical bug or documentation correction
 
-### Submitting a Pull Request (PR)
-
-Search GitHub for an open or closed PR that relates to your submission. You
-don't want to duplicate effort. If you do not find a related issue or PR,
-go ahead.
-
-1. **Development**: Fork the project, set up the [development environment][4],
-  make your changes in a separate git branch and add descriptive messages to
-  your commits.
-
-2. **Build**: Before submitting a pull requests, [build the theme][5]. This is
-  a mandatory requirement for your PR to get accepted, as the theme should at
-  all times be installable through GitHub.
-
-3. **Pull Request**: After building the theme, commit the compiled output, push
-  your branch to GitHub and send a PR to `mkdocs-material:master`. If we
-  suggest changes, make the required updates, rebase your branch and push the
-  changes to your GitHub repository, which will automatically update your PR.
-
-After your PR is merged, you can safely delete your branch and pull the changes
-from the main (upstream) repository.
-
-  [4]: https://squidfunk.github.io/mkdocs-material/customization/#environment-setup
-  [5]: https://squidfunk.github.io/mkdocs-material/customization/#build-process
+  [Report a bug]: docs/contributing/reporting-a-bug.md
+  [Report a docs issue]: docs/contributing/reporting-a-docs-issue.md
+  [Request a change]: docs/contributing/requesting-a-change.md
+  [Ask a question]: https://discord.gg/hqXRNq9CjT
+  [Fix a translation]: docs/contributing/adding-translations.md
+  [Create a pull request]: docs/contributing/making-a-pull-request.md

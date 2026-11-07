@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+# Copyright (c) 2016-2025 Martin Donath <martin.donath@squidfunk.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -27,30 +27,96 @@ on:
 env:
   PYTHON_VERSION: 3.x
 
+permissions:
+  contents: read
+  id-token: write
+  pages: write
+
 jobs:
   documentation:
     name: Build documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          sparse-checkout: |
+            docs
+            includes
+            material/overrides
+            src/templates/partials/languages
 
       - name: Set up Python runtime
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements.txt
+
+      - name: Set up build cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          key: mkdocs-material-${{ hashfiles('.cache/**') }}
+          path: ~/.cache
+          restore-keys: |
+            mkdocs-material-
+
+      - name: Install dependencies
+        run: sudo apt-get install pngquant
 
       - name: Install Python dependencies
         run: |
-          pip install .
-          pip install \
-            mkdocs-minify-plugin>=0.3 \
-            mkdocs-redirects>=1.0
+          pip install "mkdocs-material[recommended,git,imaging]" mkdocs-redirects
+          # Avoid shadowing the installed package with the sparse checkout.
+          rm -f material/__init__.py
 
-      - name: Deploy documentation
-        env:
-          GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
+      - name: Checkout documentation overrides
+        if: github.event.repository.fork == false
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: squidfunk/mkdocs-material-overrides
+          token: ${{ secrets.GH_TOKEN }}
+          path: mkdocs-material-overrides
+          persist-credentials: false
+
+      - name: Install documentation overrides
+        if: github.event.repository.fork == false
         run: |
-          mkdocs gh-deploy --force
+          rm -rf material/overrides
+          cp -r mkdocs-material-overrides/material/overrides material/overrides
+
+      - name: Build documentation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
+          DISABLE_MKDOCS_2_WARNING: true
+        run: |
+          mkdocs build --clean
           mkdocs --version
+
+      - name: Adjust permissions
+        run: |
+          chmod -c -R +rX site/ | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          name: github-pages-${{ github.run_attempt }}
+          path: site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+
+      - name: Save build cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          key: mkdocs-material-${{ hashfiles('.cache/**') }}
+          path: ~/.cache

@@ -7,7 +7,6 @@
     "jsxFactory": "h",
     "lib": [
       "dom",
-      "es2017",
       "esnext",
       "webworker"
     ],
@@ -20,23 +19,23 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "~/*": ["./assets/javascripts/*"],
+      "~/*": ["./templates/assets/javascripts/*"],
       "_/*": ["./overrides/assets/javascripts/*"]
     },
     "removeComments": false,
     "sourceMap": true,
+    "skipLibCheck": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "es2015"
+    "target": "es2018"
   },
   "include": [
-    "tools",
-    "src/assets/javascripts",
     "src/overrides/assets/javascripts",
-    "typings",
-    "webpack.config.ts"
+    "src/templates/assets/javascripts",
+    "tools",
+    "typings"
   ]
 }
